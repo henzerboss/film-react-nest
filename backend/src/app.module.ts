@@ -21,11 +21,14 @@ import { OrderModule } from './order/order.module';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        uri:
+      useFactory: async (configService: ConfigService) => {
+        const databaseUrl =
           configService.get<string>('DATABASE_URL') ||
-          'mongodb://127.0.0.1:27017/film-nest',
-      }),
+          'mongodb://127.0.0.1:27017/film-nest';
+        return {
+          uri: databaseUrl.replace('localhost', '127.0.0.1'),
+        };
+      },
     }),
     FilmsModule,
     OrderModule,
