@@ -22,23 +22,22 @@ export class OrderService {
         throw new NotFoundException(`Фильм не найден: ${filmId}`);
       }
 
-      const scheduleIndex = filmDoc.schedule.findIndex((s) => s.id === session);
-      if (scheduleIndex === -1) {
+      const scheduleItem = filmDoc.schedule.find((s) => s.id === session);
+      if (!scheduleItem) {
         throw new NotFoundException(`Сеанс не найден: ${session}`);
       }
 
-      const scheduleItem = filmDoc.schedule[scheduleIndex];
       const place = `${row}:${seat}`;
 
       if (scheduleItem.taken.includes(place)) {
         throw new BadRequestException(`Место ${row}:${seat} уже занято`);
       }
 
-      scheduleItem.taken.push(place);
+      // Создаем новый массив занятых мест
+      const updatedTaken = [...scheduleItem.taken, place];
 
-      filmDoc.markModified('schedule');
-
-      await filmDoc.save();
+      // Сохраняем изменения через репозиторий
+      await this.filmsRepository.updateSchedule(filmId, session, updatedTaken);
 
       bookedTickets.push({
         film: filmId,

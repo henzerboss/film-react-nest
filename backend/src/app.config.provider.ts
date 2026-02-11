@@ -3,29 +3,32 @@ import { Provider } from '@nestjs/common';
 
 export const APP_CONFIG = 'CONFIG';
 
-export interface AppConfigDatabase {
-  driver: string;
-  url: string;
-}
-
 export interface AppConfig {
-  database: AppConfigDatabase;
+  database: {
+    driver: string;
+    url?: string;
+    host?: string;
+    port?: number;
+    username?: string;
+    password?: string;
+    databaseName?: string;
+  };
 }
 
 export const configProvider: Provider = {
   provide: APP_CONFIG,
   inject: [ConfigService],
-  useFactory: (configService: ConfigService): AppConfig => {
-    const rawUrl =
-      configService.get<string>('DATABASE_URL') ||
-      'mongodb://127.0.0.1:27017/film-nest';
-    const url = rawUrl.replace('localhost', '127.0.0.1');
-
-    return {
-      database: {
-        driver: configService.get<string>('DATABASE_DRIVER') || 'mongodb',
-        url: url,
-      },
-    };
-  },
+  useFactory: (configService: ConfigService): AppConfig => ({
+    database: {
+      driver: configService.get<string>('DATABASE_DRIVER', 'mongodb'),
+      url: configService
+        .get<string>('DATABASE_URL')
+        ?.replace('localhost', '127.0.0.1'),
+      host: configService.get<string>('DATABASE_HOST', 'localhost'),
+      port: configService.get<number>('DATABASE_PORT', 5432),
+      username: configService.get<string>('DATABASE_USERNAME', 'postgres'),
+      password: configService.get<string>('DATABASE_PASSWORD', 'postgres'),
+      databaseName: configService.get<string>('DATABASE_NAME', 'practicum'),
+    },
+  }),
 };
