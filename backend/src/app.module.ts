@@ -12,32 +12,30 @@ import { FilmEntity, ScheduleEntity } from './films/entities/films.entity';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      cache: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true, cache: true }),
+
     ServeStaticModule.forRoot({
       rootPath: path.join(process.cwd(), 'public'),
       serveRoot: '/',
     }),
-    // Подключение MongoDB (Mongoose)
+
+    // Mongo 
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService
-          .get<string>('DATABASE_URL')
-          ?.replace('localhost', '127.0.0.1'),
+        uri: configService.get<string>('DATABASE_URL'),
       }),
     }),
-    // Подключение PostgreSQL (TypeORM)
+
+    // Postgres 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get<string>('DATABASE_HOST'),
-        port: configService.get<number>('DATABASE_PORT'),
+        port: Number(configService.get('DATABASE_PORT')),
         username: configService.get<string>('DATABASE_USERNAME'),
         password: configService.get<string>('DATABASE_PASSWORD'),
         database: configService.get<string>('DATABASE_NAME'),
@@ -45,6 +43,7 @@ import { FilmEntity, ScheduleEntity } from './films/entities/films.entity';
         synchronize: false,
       }),
     }),
+
     FilmsModule,
     OrderModule,
   ],

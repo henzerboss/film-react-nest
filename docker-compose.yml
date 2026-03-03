@@ -1,0 +1,33 @@
+services:
+  backend:
+    image: ghcr.io/henzerboss/film-react-nest-backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    depends_on: [database]
+    networks: [appnet]
+
+  frontend:
+    image: ghcr.io/henzerboss/film-react-nest-frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: "no"
+    volumes:
+      - frontend_dist:/dist
+    networks: [appnet]
+
+  nginx:
+    image: ghcr.io/henzerboss/film-react-nest-nginx:latest
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - frontend_dist:/usr/share/nginx/html:ro
+    depends_on: [backend, frontend]
+    networks: [appnet]
