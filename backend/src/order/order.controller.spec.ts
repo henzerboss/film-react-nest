@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
+import { CreateOrderDto } from './dto/order.dto';
 
 describe('OrderController', () => {
   it('createOrder returns service result', async () => {
@@ -17,14 +18,15 @@ describe('OrderController', () => {
 
     const controller = moduleRef.get(OrderController);
 
-    const dto = {
+    const dto: CreateOrderDto = {
       email: 'a@b.com',
       phone: '+7000',
       tickets: [{ film: 'f1', session: 's1', row: 1, seat: 2, daytime: 'x' }],
     };
 
-    const res = await controller.createOrder(dto as any);
-    expect(orderServiceMock.createOrder).toHaveBeenCalled();
+    const res = await controller.createOrder(dto);
+
+    expect(orderServiceMock.createOrder).toHaveBeenCalledWith(dto);
     expect(res.items).toHaveLength(1);
   });
 });

@@ -19,7 +19,7 @@ import { FilmEntity, ScheduleEntity } from './films/entities/films.entity';
       serveRoot: '/',
     }),
 
-    // Mongo 
+    // Mongo
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -28,7 +28,7 @@ import { FilmEntity, ScheduleEntity } from './films/entities/films.entity';
       }),
     }),
 
-    // Postgres 
+    // Postgres
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

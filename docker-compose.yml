@@ -7,7 +7,9 @@ services:
     restart: unless-stopped
     env_file: .env
     depends_on: [database]
-    networks: [appnet]
+    networks:
+      - frontend-network
+      - backend-network
 
   frontend:
     image: ghcr.io/henzerboss/film-react-nest-frontend:latest
@@ -17,7 +19,8 @@ services:
     restart: "no"
     volumes:
       - frontend_dist:/dist
-    networks: [appnet]
+    networks:
+      - frontend-network
 
   nginx:
     image: ghcr.io/henzerboss/film-react-nest-nginx:latest
@@ -30,4 +33,14 @@ services:
     volumes:
       - frontend_dist:/usr/share/nginx/html:ro
     depends_on: [backend, frontend]
-    networks: [appnet]
+    networks:
+      - frontend-network
+
+volumes:
+  frontend_dist:
+
+networks:
+  frontend-network:
+    driver: bridge
+  backend-network:
+    driver: bridge
